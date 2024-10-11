@@ -59,7 +59,7 @@ class ShowDates(models.Model):
         return f"{self.dates}"
 
 
-class ScreenDetails(models.Model):
+class   ScreenDetails(models.Model):
     theatre = models.ForeignKey(
         TheatreDetails, on_delete=models.CASCADE, related_name="screen_details"
     )

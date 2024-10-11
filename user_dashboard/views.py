@@ -277,6 +277,7 @@ class MovieSelectionView(APIView):
             ScreenDetails.objects.filter(Q_Base)
             .annotate(
                 theatre_name=F("theatre__theatre_name"),
+                theatre_location=F("theatre__location__place"),
                 show_time=F("shows__show_time__time"),
                 language=F("shows__language__name"),
                 show_dates=F("shows__show_dates__dates"),
@@ -294,7 +295,8 @@ class MovieSelectionView(APIView):
             key = (
                 screen_details["theatre_name"],
                 screen_details["screen_number"],
-                screen_details["language"],
+                screen_details["language"]
+               
             )
             if str(screen_details.get("show_dates")) == date:
                 grouped_data[key].append({"show_time": screen_details["show_time"]})
@@ -332,7 +334,7 @@ class MovieSelectionView(APIView):
         if q:
             Q_Base &= Q(screen__shows__language__name=q)
         screen_details = screen_seat_details(Q_Base)
-        print(screen_details)
+        
         if screen_details is None:
             return {"data": "No data"}
         return screen_details
@@ -384,13 +386,12 @@ class TheatreSelectionView(APIView):
             queryset = TheatreDetails.objects.filter(
                 Q(location__place=location)
                 | Q(location__district=location) & Q(is_verified=True)
-            ).values("theatre_name", "address")
+            ).values("theatre_name", "address",theatre_location=F("location__place"))
             if queryset:
                 return Response(queryset, status=status.HTTP_200_OK)
             return Response(
                 {"msg": "No theatre In your Location"}, status=status.HTTP_404_NOT_FOUND
             )
-
         date = date_formatting(date)
         if date not in Available_dates:
             print(Available_dates)
@@ -416,6 +417,7 @@ class TheatreSelectionView(APIView):
                     movie_name=F("shows__movies__movie_name"),
                     show_dates=F("shows__show_dates__dates"),
                     language=F("shows__language__name"),
+                    address=F("theatre__address")
                 )
                 .values(
                     "screen_number",
@@ -423,7 +425,7 @@ class TheatreSelectionView(APIView):
                     "show_time",
                     "movie_name",
                     "language",
-                    "show_dates",
+                    "show_dates"
                 )
             )
 
@@ -434,7 +436,6 @@ class TheatreSelectionView(APIView):
                 show_time = screen_details["show_time"]
                 language = screen_details["language"]
                 movie_name = screen_details["movie_name"]
-
                 if str(screen_details.get("show_dates")) == date:
                     existing_screen = next(
                         (
@@ -451,6 +452,7 @@ class TheatreSelectionView(APIView):
                                 "show_time": show_time,
                                 "language": language,
                                 "movie_name": movie_name,
+                               
                             }
                         )
                     else:

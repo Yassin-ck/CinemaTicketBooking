@@ -530,7 +530,7 @@ class ShowDetailsForUpdating(APIView):
             dates_to_exclude = [i["date"] for i in show]
             Q_Base = Q(dates__gt=today) & ~Q(dates__in=dates_to_exclude)
             queryset = self.get_model_data(ShowDates, Q_Base)
-        elif q[:8] == LANGUAGE:
+        elif q[:8] == LANGUAGE: 
             show = Shows.objects.filter(
                 Q(screen_id=screen_id)
                 & Q(show_dates__dates__gt=today)

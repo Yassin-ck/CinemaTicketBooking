@@ -39,7 +39,6 @@ from authentications.models import (
     RequestLocation,
 )
 from .models import (
-    Languages,
     MoviesDetails,
 )
 
